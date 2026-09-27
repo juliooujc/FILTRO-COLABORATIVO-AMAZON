@@ -1,8 +1,10 @@
 from collections import defaultdict
 
-from app.db.queries import buscar_produtos_usuario
 from app.db.connection import get_connection
-
+from app.db.queries import (
+    buscar_produtos_usuario,
+    buscar_produto,
+)
 from app.recommender.knn import encontrar_vizinhos
 
 
@@ -45,9 +47,11 @@ def gerar_recomendacoes(
 ):
     user_products = buscar_produtos_usuario(user_id)
 
+    # Usuário sem histórico
     if not user_products:
         return {
             "cold_start": True,
+            "neighbors": [],
             "recommendations": gerar_recomendacoes_populares(limit),
         }
 
@@ -117,10 +121,24 @@ def gerar_recomendacoes(
         reverse=True
     )
 
+    # Adiciona os dados dos produtos às recomendações.
+    recommendations_with_products = []
+
+    for recommendation in recommendations[:limit]:
+
+        product = buscar_produto(
+            recommendation["parent_asin"]
+        )
+
+        recommendations_with_products.append({
+            **recommendation,
+            "product": product
+        })
+
     return {
         "cold_start": False,
         "neighbors": neighbors,
-        "recommendations": recommendations[:limit],
+        "recommendations": recommendations_with_products,
     }
 
 

@@ -172,3 +172,49 @@ def buscar_ratings_comuns_dos_candidatos(
         }
         for row in rows
     ]
+
+def buscar_usuarios():
+    query = """
+        SELECT user_id
+        FROM users
+        ORDER BY user_id
+        LIMIT 1000;
+    """
+
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(query)
+            rows = cur.fetchall()
+
+    return [
+        row[0]
+        for row in rows
+    ]
+
+def buscar_produto(parent_asin: str):
+    query = """
+        SELECT
+            parent_asin,
+            title,
+            description,
+            price,
+            image_url
+        FROM products
+        WHERE parent_asin = %s;
+    """
+
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(query, (parent_asin,))
+            row = cur.fetchone()
+
+    if not row:
+        return None
+
+    return {
+        "parent_asin": row[0],
+        "title": row[1],
+        "description": row[2],
+        "price": float(row[3]) if row[3] is not None else None,
+        "image_url": row[4],
+    }

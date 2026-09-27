@@ -1,6 +1,10 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 
-from app.db.queries import buscar_historico_usuario
+from app.db.queries import (
+    buscar_historico_usuario,
+    buscar_usuarios,
+)
+
 
 router = APIRouter(
     prefix="/users",
@@ -8,9 +12,17 @@ router = APIRouter(
 )
 
 
+@router.get("")
+def get_users():
+    users = buscar_usuarios()
+
+    return {
+        "users": users
+    }
+
+
 @router.get("/{user_id}/history")
 def get_user_history(user_id: str):
-
     history = buscar_historico_usuario(user_id)
 
     if not history:
