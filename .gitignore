@@ -1,0 +1,6 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+Grocery_and_Gourmet_Food.csv
+analise_dataset.py
