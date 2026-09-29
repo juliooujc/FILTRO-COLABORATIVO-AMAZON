@@ -1720,33 +1720,338 @@
                   RESPONSIVIDADE
 ================================================= */
 
-@media (max-width: 760px) {
-    /* Detalhes do produto */
+/* Detalhes do produto */
 
-    .product-details-card {
-        grid-template-columns: 1fr;
-        gap: 24px;
-        padding: 22px;
+.product-details-status {
+  padding: 30px;
+  text-align: center;
+  font-size: 18px;
+}
+
+.product-details-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-details-nav button {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.product-details-user {
+  font-size: 15px;
+}
+
+.product-details-back-button {
+  margin-bottom: 20px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #e5eee7;
+  color: #234b35;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.product-details-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 32px;
+  padding: 30px;
+  margin-bottom: 25px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.product-details-image-container {
+  flex: 0 0 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-details-image {
+  width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+}
+
+.product-details-image-placeholder {
+  width: 100%;
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f4f1;
+  color: #66736a;
+  border-radius: 8px;
+}
+
+.product-details-info {
+  flex: 1;
+}
+
+.product-details-info h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 25px;
+  color: #234b35;
+}
+
+.product-details-description {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #4e5b52;
+}
+
+.product-details-price {
+  margin-top: 20px;
+  font-size: 19px;
+  font-weight: 600;
+  color: #234b35;
+}
+
+.product-details-asin {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #78847b;
+}
+
+/* Avaliação */
+
+.product-rating-section {
+  padding: 30px;
+  margin-bottom: 30px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.product-rating-section h2 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: #234b35;
+  font-size: 23px;
+}
+
+.product-rating-description {
+  margin-bottom: 18px;
+  color: #59665d;
+  font-size: 16px;
+}
+
+.product-rating-stars {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.product-rating-stars button {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #dfe5df;
+  font-size: 42px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.product-rating-stars button.selected {
+  color: #d49a35;
+}
+
+.product-rating-stars button:hover:not(:disabled) {
+  color: #d49a35;
+  transform: scale(1.12);
+}
+
+.product-rating-stars button:disabled {
+  cursor: default;
+}
+
+.product-rating-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.product-rating-save-button,
+.product-rating-delete-button {
+  min-height: 46px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.product-rating-save-button {
+  background: #2f6848;
+  color: #ffffff;
+}
+
+.product-rating-save-button:hover:not(:disabled) {
+  background: #24563a;
+}
+
+.product-rating-delete-button {
+  background: #f3e7e5;
+  color: #963f36;
+}
+
+.product-rating-delete-button:hover:not(:disabled) {
+  background: #ead5d2;
+}
+
+.product-rating-save-button:disabled,
+.product-rating-delete-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.product-rating-message {
+  margin-top: 16px;
+  font-size: 15px;
+  color: #2f6848;
+}
+
+/* Ajustes para telas menores */
+
+@media (max-width: 700px) {
+  .product-details-card {
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .product-details-image-container {
+    width: 100%;
+    flex-basis: auto;
+  }
+
+  .product-details-image {
+    max-height: 220px;
+  }
+
+  .product-rating-section {
+    padding: 22px;
+  }
+
+  .product-rating-stars {
+    gap: 6px;
+  }
+
+  .product-rating-stars button {
+    font-size: 36px;
+  }
+
+  .product-details-nav {
+    flex-wrap: wrap;
+  }
+}
+
+
+/* ==============================================
+            CRUD DE AVALIAÇÃO
+================================================= */
+
+.product-rating-section {
+    margin-top: 36px;
+    padding: 30px;
+    border: 1px solid #e5eae6;
+    border-radius: 16px;
+    background: #f9faf8;
+}
+
+.product-rating-section h2 {
+    margin-bottom: 12px;
+    color: #263f35;
+    font-size: 23px;
+}
+
+.product-rating-section p {
+    color: #657169;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.product-rating-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.product-rating-actions button {
+    min-height: 46px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 9px;
+    background: #247452;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.product-rating-actions button:hover {
+    background: #195d40;
+    transform: translateY(-1px);
+}
+
+.product-rating-actions button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.product-rating-actions button.delete {
+    border: 1px solid #ead3d0;
+    background: #fff8f7;
+    color: #a94442;
+}
+
+.product-rating-actions button.delete:hover {
+    background: #fbe9e7;
+}
+
+.product-rating-error,
+.product-rating-success {
+    margin-top: 18px;
+    padding: 14px 16px;
+    border-radius: 9px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+    .product-rating-section {
+        padding: 20px;
     }
 
-    .product-details-image {
-        min-height: 240px;
+    .product-rating-stars {
+        gap: 6px;
     }
 
-
-    /* Histórico */
-
-    .history-item {
-        grid-template-columns: 72px minmax(0, 1fr);
-        gap: 14px;
+    .product-rating-stars button {
+        font-size: 36px;
     }
 
-    .history-rating,
-    .history-date {
-        grid-column: 2;
+    .product-rating-actions {
+        flex-direction: column;
+        align-items: stretch;
     }
 
-    .history-item .product-details-button {
-        grid-column: 1 / -1;
+    .product-rating-actions button {
+        width: 100%;
     }
 }
