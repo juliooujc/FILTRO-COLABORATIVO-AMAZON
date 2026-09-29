@@ -11,3 +11,12 @@ export async function getUserHistory(userId) {
         `/users/${encodeURIComponent(userId)}/history`
     );
 }
+
+export async function createUser(userId) {
+    return request("/users", {
+        method: "POST",
+        body: JSON.stringify({
+            user_id: userId,
+        }),
+    });
+}

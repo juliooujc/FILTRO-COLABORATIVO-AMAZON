@@ -1,9 +1,19 @@
 from pydantic import BaseModel, Field
 
 
+class UserRequest(BaseModel):
+    user_id: str = Field(
+        min_length=1,
+        max_length=50
+    )
+
+
 class RatingRequest(BaseModel):
     parent_asin: str
-    rating: float = Field(ge=1, le=5)
+    rating: float = Field(
+        ge=1,
+        le=5
+    )
 
 
 class RatingResponse(BaseModel):

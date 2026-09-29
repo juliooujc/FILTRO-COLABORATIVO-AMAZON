@@ -230,3 +230,33 @@ def buscar_produto(parent_asin: str):
         "price": float(row[3]) if row[3] is not None else None,
         "image_url": row[4],
     }
+
+
+def criar_usuario(user_id: str):
+    query = """
+        INSERT INTO users (user_id)
+        VALUES (%s);
+    """
+
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(query, (user_id,))
+
+        conn.commit()
+
+
+def usuario_existe(user_id: str):
+    query = """
+        SELECT EXISTS (
+            SELECT 1
+            FROM users
+            WHERE user_id = %s
+        );
+    """
+
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(query, (user_id,))
+            row = cur.fetchone()
+
+    return row[0]
