@@ -187,7 +187,9 @@ def buscar_ratings_comuns_dos_candidatos(
 
 def buscar_usuarios():
     query = """
-        SELECT user_id
+        SELECT
+            user_id,
+            name
         FROM users
         ORDER BY user_id
         LIMIT 1000;
@@ -199,7 +201,10 @@ def buscar_usuarios():
             rows = cur.fetchall()
 
     return [
-        row[0]
+        {
+            "user_id": row[0],
+            "name": row[1],
+        }
         for row in rows
     ]
 
@@ -232,15 +237,15 @@ def buscar_produto(parent_asin: str):
     }
 
 
-def criar_usuario(user_id: str):
+def criar_usuario(user_id: str, name: str):
     query = """
-        INSERT INTO users (user_id)
-        VALUES (%s);
+        INSERT INTO users (user_id, name)
+        VALUES (%s, %s);
     """
 
     with get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute(query, (user_id,))
+            cur.execute(query, (user_id, name))
 
         conn.commit()
 
@@ -260,3 +265,26 @@ def usuario_existe(user_id: str):
             row = cur.fetchone()
 
     return row[0]
+
+
+def buscar_usuario(user_id: str):
+    query = """
+        SELECT
+            user_id,
+            name
+        FROM users
+        WHERE user_id = %s;
+    """
+
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(query, (user_id,))
+            row = cur.fetchone()
+
+    if not row:
+        return None
+
+    return {
+        "user_id": row[0],
+        "name": row[1],
+    }

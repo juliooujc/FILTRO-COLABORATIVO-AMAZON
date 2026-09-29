@@ -6,6 +6,10 @@ class UserRequest(BaseModel):
         min_length=1,
         max_length=50
     )
+    name: str = Field(
+        min_length=1,
+        max_length=100
+    )
 
 
 class RatingRequest(BaseModel):

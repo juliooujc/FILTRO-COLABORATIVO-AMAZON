@@ -12,11 +12,12 @@ export async function getUserHistory(userId) {
     );
 }
 
-export async function createUser(userId) {
+export async function createUser(userId, name) {
     return request("/users", {
         method: "POST",
         body: JSON.stringify({
             user_id: userId,
+            name: name,
         }),
     });
 }

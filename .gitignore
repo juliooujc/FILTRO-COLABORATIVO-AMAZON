@@ -4,3 +4,4 @@ __pycache__/
 .venv/
 Grocery_and_Gourmet_Food.csv
 analise_dataset.py
+extrair_produtos.py

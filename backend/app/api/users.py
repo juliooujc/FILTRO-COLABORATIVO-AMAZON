@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 
 from app.db.queries import (
     buscar_historico_usuario,
+    buscar_usuario,
     buscar_usuarios,
     criar_usuario,
     usuario_existe,
@@ -35,11 +36,15 @@ def create_user(request: UserRequest):
         )
 
     try:
-        criar_usuario(request.user_id)
+        criar_usuario(
+            request.user_id,
+            request.name
+        )
 
         return {
             "message": "Usuário criado.",
-            "user_id": request.user_id
+            "user_id": request.user_id,
+            "name": request.name
         }
 
     except Exception as error:
@@ -52,16 +57,26 @@ def create_user(request: UserRequest):
 @router.get("/{user_id}/history")
 def get_user_history(user_id: str):
 
+    user = buscar_usuario(user_id)
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="Usuário não encontrado."
+        )
+
     history = buscar_historico_usuario(user_id)
 
     if not history:
         return {
-            "user_id": user_id,
+            "user_id": user["user_id"],
+            "name": user["name"],
             "history": [],
             "message": "Usuário sem histórico."
         }
 
     return {
-        "user_id": user_id,
+        "user_id": user["user_id"],
+        "name": user["name"],
         "history": history
     }
