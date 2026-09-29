@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { getUserHistory } from "../api/users";
 import { getProduct } from "../api/products";
@@ -97,7 +97,7 @@ function History() {
                 if (!cancelled) {
                     setError(
                         err.message ||
-                        "Não foi possível carregar o histórico."
+                            "Não foi possível carregar o histórico."
                     );
                 }
             } finally {
@@ -172,7 +172,9 @@ function History() {
                 <nav className="dashboard-nav">
                     <button
                         onClick={() =>
-                            navigate("/dashboard", { state: { userId, userName } })
+                            navigate("/dashboard", {
+                                state: { userId, userName },
+                            })
                         }
                     >
                         Dashboard
@@ -180,7 +182,9 @@ function History() {
 
                     <button
                         onClick={() =>
-                            navigate("/recommendations", { state: { userId, userName } })
+                            navigate("/recommendations", {
+                                state: { userId, userName },
+                            })
                         }
                     >
                         Recomendações
@@ -221,8 +225,9 @@ function History() {
 
                         <div>
                             <small>Usuário atual</small>
-                            <strong>{displayName}</strong>
-                            {userName && <small>{userId}</small>}
+                            <strong className="current-user-name">{userName || userId}</strong>
+
+                            {userName && <small className="current-user-id">{userId}</small>}
                         </div>
                     </div>
                 </div>
@@ -257,8 +262,8 @@ function History() {
                                 {loading
                                     ? "..."
                                     : history.filter(
-                                        (item) => Number(item.rating) >= 4
-                                    ).length}
+                                          (item) => Number(item.rating) >= 4
+                                      ).length}
                             </strong>
                         </div>
                     </article>
@@ -325,7 +330,9 @@ function History() {
                         </div>
                     ) : error ? (
                         <div className="history-message error">
-                            <strong>Não foi possível carregar o histórico</strong>
+                            <strong>
+                                Não foi possível carregar o histórico
+                            </strong>
                             <p>{error}</p>
                             <button
                                 onClick={() => window.location.reload()}
@@ -352,18 +359,22 @@ function History() {
                     ) : (
                         <div className="history-list">
                             {filteredHistory.map((item, index) => (
-                                <article
-                                    className="history-item"
+                                <Link
+                                    to={`/products/${encodeURIComponent(
+                                        item.parent_asin
+                                    )}`}
+                                    state={{ userId, userName }}
+                                    className="history-item product-card-link"
                                     key={`${item.parent_asin}-${item.timestamp ?? index}`}
+                                    aria-label={`Ver detalhes do produto ${
+                                        item.product?.title || item.parent_asin
+                                    }`}
                                 >
                                     <div className="history-product-image">
                                         {item.product?.image_url ? (
                                             <img
                                                 src={item.product.image_url}
-                                                alt={
-                                                    item.product.title ||
-                                                    "Produto avaliado"
-                                                }
+                                                alt=""
                                             />
                                         ) : (
                                             <div className="history-image-placeholder">
@@ -419,21 +430,7 @@ function History() {
                                             {formatDate(item.timestamp)}
                                         </strong>
                                     </div>
-
-                                    <button
-                                        type="button"
-                                        className="product-details-button"
-                                        onClick={() =>
-                                            navigate(
-                                                `/products/${encodeURIComponent(item.parent_asin)}`,
-                                                { state: { userId, userName } }
-                                            )
-                                        }
-                                    >
-                                        Ver produto
-                                        <span aria-hidden="true">→</span>
-                                    </button>
-                                </article>
+                                </Link>
                             ))}
                         </div>
                     )}

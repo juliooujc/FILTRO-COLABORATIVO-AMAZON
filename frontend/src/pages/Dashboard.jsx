@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { getUserHistory } from "../api/users";
 import { getRecommendations } from "../api/recommendations";
@@ -296,8 +296,9 @@ function Dashboard() {
 
                         <div>
                             <small>Usuário atual</small>
-                            <strong>{displayName}</strong>
-                            {userName && <small>{userId}</small>}
+                            <strong className="current-user-name">{userName || userId}</strong>
+
+                            {userName && <small className="current-user-id">{userId}</small>}
                         </div>
                     </div>
                 </div>
@@ -389,36 +390,6 @@ function Dashboard() {
                     </div>
 
                     <div className="analytics-card">
-                        {/* Filtros */}
-                        <div className="analytics-filters">
-                            <label>
-                                Nota mínima
-
-                                <select
-                                    value={ratingFilter}
-                                    onChange={(event) =>
-                                        setRatingFilter(event.target.value)
-                                    }
-                                >
-                                    <option value="all">
-                                        Todas as notas
-                                    </option>
-                                    <option value="2">
-                                        2 estrelas ou mais
-                                    </option>
-                                    <option value="3">
-                                        3 estrelas ou mais
-                                    </option>
-                                    <option value="4">
-                                        4 estrelas ou mais
-                                    </option>
-                                    <option value="5">
-                                        Somente 5 estrelas
-                                    </option>
-                                </select>
-                            </label>
-                        </div>
-
                         {/* Gráfico */}
                         <div className="rating-chart">
                             <div className="chart-heading">
@@ -536,17 +507,19 @@ function Dashboard() {
 
                             <div className="recommendation-grid">
                                 {recommendations.map((item) => (
-                                    <article
-                                        className="recommendation-card"
+                                    <Link
+                                        to={`/products/${encodeURIComponent(item.parent_asin)}`}
+                                        state={{ userId, userName }}
+                                        className="recommendation-card product-card-link"
                                         key={item.parent_asin}
+                                        aria-label={`Ver detalhes do produto ${
+                                            item.product?.title || item.parent_asin
+                                        }`}
                                     >
                                         {item.product?.image_url ? (
                                             <img
                                                 src={item.product.image_url}
-                                                alt={
-                                                    item.product.title ||
-                                                    "Produto recomendado"
-                                                }
+                                                alt=""
                                             />
                                         ) : (
                                             <div className="product-image-placeholder">
@@ -572,7 +545,7 @@ function Dashboard() {
                                                 )}
                                             </small>
                                         </div>
-                                    </article>
+                                    </Link>
                                 ))}
                             </div>
                         </>
@@ -624,17 +597,19 @@ function Dashboard() {
                     ) : (
                         <div className="recent-list">
                             {recentHistory.map((item) => (
-                                <article
-                                    className="recent-item"
+                                <Link
+                                    to={`/products/${encodeURIComponent(item.parent_asin)}`}
+                                    state={{ userId, userName }}
+                                    className="recent-item product-card-link"
                                     key={item.parent_asin}
+                                    aria-label={`Ver detalhes do produto ${
+                                        item.product?.title || item.parent_asin
+                                    }`}
                                 >
                                     {item.product?.image_url ? (
                                         <img
                                             src={item.product.image_url}
-                                            alt={
-                                                item.product.title ||
-                                                "Produto avaliado"
-                                            }
+                                            alt=""
                                         />
                                     ) : (
                                         <div className="recent-image-placeholder">
@@ -656,7 +631,7 @@ function Dashboard() {
                                     <span className="recent-rating">
                                         ★ {Number(item.rating).toFixed(1)}
                                     </span>
-                                </article>
+                                </Link>
                             ))}
                         </div>
                     )}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { getRecommendations } from "../api/recommendations";
 import { getProduct } from "../api/products";
@@ -26,8 +26,7 @@ function Recommendations() {
     const navigate = useNavigate();
 
     const userId = location.state?.userId;
-    const userName = location.state?.userName || "";
-    const displayName = userName || userId;
+    const userName = location.state?.userName;
 
     const [recommendations, setRecommendations] = useState([]);
     const [neighborCount, setNeighborCount] = useState(0);
@@ -102,7 +101,7 @@ function Recommendations() {
                 if (!cancelled) {
                     setError(
                         err.message ||
-                        "Não foi possível carregar as recomendações."
+                            "Não foi possível carregar as recomendações."
                     );
                 }
             } finally {
@@ -124,10 +123,7 @@ function Recommendations() {
 
         setDraftConfig((current) => ({
             ...current,
-            [name]:
-                name === "method"
-                    ? value
-                    : Number(value),
+            [name]: name === "method" ? value : Number(value),
         }));
     }
 
@@ -163,7 +159,9 @@ function Recommendations() {
                 <nav className="dashboard-nav">
                     <button
                         onClick={() =>
-                            navigate("/dashboard", { state: { userId, userName } })
+                            navigate("/dashboard", {
+                                state: { userId, userName },
+                            })
                         }
                     >
                         Dashboard
@@ -175,7 +173,9 @@ function Recommendations() {
 
                     <button
                         onClick={() =>
-                            navigate("/history", { state: { userId, userName } })
+                            navigate("/history", {
+                                state: { userId, userName },
+                            })
                         }
                     >
                         Histórico
@@ -207,13 +207,14 @@ function Recommendations() {
 
                     <div className="current-user">
                         <span className="current-user-avatar">
-                            {displayName.charAt(0).toUpperCase()}
+                            {(userName || userId).charAt(0).toUpperCase()}
                         </span>
 
                         <div>
                             <small>Usuário atual</small>
-                            <strong>{displayName}</strong>
-                            {userName && <small>{userId}</small>}
+                            <strong className="current-user-name">{userName || userId}</strong>
+
+                            {userName && <small className="current-user-id">{userId}</small>}
                         </div>
                     </div>
                 </div>
@@ -258,7 +259,9 @@ function Recommendations() {
                             <span className="dashboard-eyebrow">
                                 ALGORITMO DE RECOMENDAÇÃO
                             </span>
+
                             <h2>Produtos sugeridos</h2>
+
                             <p>
                                 Ajuste os parâmetros para explorar diferentes
                                 resultados do algoritmo.
@@ -352,7 +355,9 @@ function Recommendations() {
                         </div>
                     ) : error ? (
                         <div className="recommendations-message error">
-                            <strong>Não foi possível carregar as recomendações</strong>
+                            <strong>
+                                Não foi possível carregar as recomendações
+                            </strong>
                             <p>{error}</p>
                             <button onClick={handleApplyFilters}>
                                 Tentar novamente
@@ -360,7 +365,9 @@ function Recommendations() {
                         </div>
                     ) : recommendations.length === 0 ? (
                         <div className="recommendations-message">
-                            <strong>Nenhuma recomendação encontrada</strong>
+                            <strong>
+                                Nenhuma recomendação encontrada
+                            </strong>
                             <p>
                                 Não encontramos produtos para os parâmetros
                                 selecionados. Tente reduzir o mínimo de itens
@@ -370,18 +377,22 @@ function Recommendations() {
                     ) : (
                         <div className="recommendations-grid">
                             {recommendations.map((item) => (
-                                <article
-                                    className="recommendation-card"
+                                <Link
+                                    to={`/products/${encodeURIComponent(
+                                        item.parent_asin
+                                    )}`}
+                                    state={{ userId, userName }}
+                                    className="recommendation-card product-card-link"
                                     key={item.parent_asin}
+                                    aria-label={`Ver detalhes do produto ${
+                                        item.product?.title || item.parent_asin
+                                    }`}
                                 >
                                     <div className="recommendation-image">
                                         {item.product?.image_url ? (
                                             <img
                                                 src={item.product.image_url}
-                                                alt={
-                                                    item.product.title ||
-                                                    "Produto recomendado"
-                                                }
+                                                alt=""
                                             />
                                         ) : (
                                             <div className="product-image-placeholder">
@@ -423,7 +434,9 @@ function Recommendations() {
                                             </div>
 
                                             <span className="recommendation-price">
-                                                {formatPrice(item.product?.price)}
+                                                {formatPrice(
+                                                    item.product?.price
+                                                )}
                                             </span>
                                         </div>
 
@@ -434,19 +447,8 @@ function Recommendations() {
                                                     na base
                                                 </small>
                                             )}
-
-                                            <button
-                                                type="button"
-                                                className="product-details-button"
-                                                onClick={() =>
-                                                    navigate(
-                                                        `/products/${encodeURIComponent(item.parent_asin)}`,
-                                                        { state: { userId, userName } })}>
-                                                Ver detalhes
-                                                <span aria-hidden="true">→</span>
-                                            </button>
                                     </div>
-                                </article>
+                                </Link>
                             ))}
                         </div>
                     )}

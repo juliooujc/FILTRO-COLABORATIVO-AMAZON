@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { getUsers } from "../api/users";
+import { createUser, getUsers } from "../api/users";
 
 function normalizeUser(user) {
     // Compatibilidade com a resposta antiga: "users": ["ID123", ...]
@@ -28,6 +28,13 @@ function UserSelection() {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    // Estados da criação de usuário
+    const [showCreateUser, setShowCreateUser] = useState(false);
+    const [newUserId, setNewUserId] = useState("");
+    const [newUserName, setNewUserName] = useState("");
+    const [creatingUser, setCreatingUser] = useState(false);
+    const [createError, setCreateError] = useState(null);
 
     useEffect(() => {
         async function loadUsers() {
@@ -88,6 +95,55 @@ function UserSelection() {
                 userName: selectedUser.name,
             },
         });
+    }
+
+    function handleOpenCreateUser() {
+        setShowCreateUser((current) => !current);
+        setCreateError(null);
+    }
+
+    async function handleCreateUser(event) {
+        event.preventDefault();
+
+        const userId = newUserId.trim();
+        const name = newUserName.trim();
+
+        if (!userId || !name) {
+            setCreateError("Preencha o ID e o nome do usuário.");
+            return;
+        }
+
+        try {
+            setCreatingUser(true);
+            setCreateError(null);
+
+            const data = await createUser(userId, name);
+
+            const newUser = normalizeUser({
+                user_id: data.user_id,
+                name: data.name,
+            });
+
+            setUsers((currentUsers) => [...currentUsers, newUser]);
+            setSelectedUser(newUser);
+
+            setSearch("");
+            setNewUserId("");
+            setNewUserName("");
+            setShowCreateUser(false);
+        } catch (err) {
+            console.error(err);
+
+            if (err.status === 409) {
+                setCreateError("Já existe um usuário com esse ID.");
+            } else {
+                setCreateError(
+                    err.message || "Não foi possível criar o usuário."
+                );
+            }
+        } finally {
+            setCreatingUser(false);
+        }
     }
 
     return (
@@ -227,6 +283,74 @@ function UserSelection() {
                             )}
                         </>
                     )}
+
+                    {/* Criação de usuário */}
+                    <div className="create-user-section">
+                        <button
+                            type="button"
+                            className="create-user-toggle"
+                            onClick={handleOpenCreateUser}
+                        >
+                            {showCreateUser
+                                ? "Cancelar criação"
+                                : "+ Criar novo usuário"}
+                        </button>
+
+                        {showCreateUser && (
+                            <form
+                                className="create-user-form"
+                                onSubmit={handleCreateUser}
+                            >
+                                <h3>Novo usuário</h3>
+
+                                <label htmlFor="new-user-id">
+                                    ID do usuário
+                                </label>
+                                <input
+                                    id="new-user-id"
+                                    type="text"
+                                    placeholder="Ex.: USER123"
+                                    value={newUserId}
+                                    onChange={(event) =>
+                                        setNewUserId(event.target.value)
+                                    }
+                                    maxLength={50}
+                                    required
+                                />
+
+                                <label htmlFor="new-user-name">
+                                    Nome
+                                </label>
+                                <input
+                                    id="new-user-name"
+                                    type="text"
+                                    placeholder="Ex.: João"
+                                    value={newUserName}
+                                    onChange={(event) =>
+                                        setNewUserName(event.target.value)
+                                    }
+                                    maxLength={100}
+                                    required
+                                />
+
+                                {createError && (
+                                    <div className="create-user-error">
+                                        {createError}
+                                    </div>
+                                )}
+
+                                <button
+                                    type="submit"
+                                    className="create-user-submit"
+                                    disabled={creatingUser}
+                                >
+                                    {creatingUser
+                                        ? "Criando..."
+                                        : "Criar usuário"}
+                                </button>
+                            </form>
+                        )}
+                    </div>
 
                     <button
                         type="button"
