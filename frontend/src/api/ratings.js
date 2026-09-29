@@ -1,3 +1,5 @@
+// ratings.js
+
 import request from "./client";
 
 export async function rateProduct(

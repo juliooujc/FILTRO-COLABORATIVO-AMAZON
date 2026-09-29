@@ -1,5 +1,6 @@
 from app.db.connection import get_connection
 
+# __init__.py
 
 def buscar_train_usuario(user_id: str):
     query = """

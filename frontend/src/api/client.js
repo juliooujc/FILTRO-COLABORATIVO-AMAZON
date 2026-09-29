@@ -1,3 +1,5 @@
+// client.js
+
 const API_URL = "http://localhost:8000";
 
 async function request(endpoint, options = {}) {

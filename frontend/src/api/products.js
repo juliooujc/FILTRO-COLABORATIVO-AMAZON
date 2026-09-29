@@ -1,3 +1,5 @@
+// products.js
+
 import request from "./client";
 
 export async function getProduct(parentAsin) {

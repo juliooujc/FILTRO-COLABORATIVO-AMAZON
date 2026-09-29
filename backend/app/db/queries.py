@@ -6,8 +6,14 @@ def buscar_historico_usuario(user_id: str):
         SELECT
             r.parent_asin,
             r.rating,
-            r.timestamp
+            r.timestamp,
+            p.title,
+            p.description,
+            p.price,
+            p.image_url
         FROM ratings r
+        LEFT JOIN products p
+            ON p.parent_asin = r.parent_asin
         WHERE r.user_id = %s
         ORDER BY r.timestamp;
     """
@@ -22,6 +28,12 @@ def buscar_historico_usuario(user_id: str):
             "parent_asin": row[0],
             "rating": float(row[1]),
             "timestamp": row[2],
+            "product": {
+                "title": row[3],
+                "description": row[4],
+                "price": float(row[5]) if row[5] is not None else None,
+                "image_url": row[6],
+            }
         }
         for row in rows
     ]
