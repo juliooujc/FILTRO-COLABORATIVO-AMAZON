@@ -43,6 +43,8 @@ function History() {
     const navigate = useNavigate();
 
     const userId = location.state?.userId;
+    const userName = location.state?.userName || "";
+    const displayName = userName || userId;
 
     const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -170,7 +172,7 @@ function History() {
                 <nav className="dashboard-nav">
                     <button
                         onClick={() =>
-                            navigate("/dashboard", { state: { userId } })
+                            navigate("/dashboard", { state: { userId, userName } })
                         }
                     >
                         Dashboard
@@ -178,7 +180,7 @@ function History() {
 
                     <button
                         onClick={() =>
-                            navigate("/recommendations", { state: { userId } })
+                            navigate("/recommendations", { state: { userId, userName } })
                         }
                     >
                         Recomendações
@@ -214,12 +216,13 @@ function History() {
 
                     <div className="current-user">
                         <span className="current-user-avatar">
-                            {userId.charAt(0).toUpperCase()}
+                            {displayName.charAt(0).toUpperCase()}
                         </span>
 
                         <div>
                             <small>Usuário atual</small>
-                            <strong>{userId}</strong>
+                            <strong>{displayName}</strong>
+                            {userName && <small>{userId}</small>}
                         </div>
                     </div>
                 </div>
@@ -423,7 +426,7 @@ function History() {
                                         onClick={() =>
                                             navigate(
                                                 `/products/${encodeURIComponent(item.parent_asin)}`,
-                                                { state: { userId } }
+                                                { state: { userId, userName } }
                                             )
                                         }
                                     >

@@ -26,6 +26,8 @@ function Recommendations() {
     const navigate = useNavigate();
 
     const userId = location.state?.userId;
+    const userName = location.state?.userName || "";
+    const displayName = userName || userId;
 
     const [recommendations, setRecommendations] = useState([]);
     const [neighborCount, setNeighborCount] = useState(0);
@@ -161,7 +163,7 @@ function Recommendations() {
                 <nav className="dashboard-nav">
                     <button
                         onClick={() =>
-                            navigate("/dashboard", { state: { userId } })
+                            navigate("/dashboard", { state: { userId, userName } })
                         }
                     >
                         Dashboard
@@ -173,7 +175,7 @@ function Recommendations() {
 
                     <button
                         onClick={() =>
-                            navigate("/history", { state: { userId } })
+                            navigate("/history", { state: { userId, userName } })
                         }
                     >
                         Histórico
@@ -205,12 +207,13 @@ function Recommendations() {
 
                     <div className="current-user">
                         <span className="current-user-avatar">
-                            {userId.charAt(0).toUpperCase()}
+                            {displayName.charAt(0).toUpperCase()}
                         </span>
 
                         <div>
                             <small>Usuário atual</small>
-                            <strong>{userId}</strong>
+                            <strong>{displayName}</strong>
+                            {userName && <small>{userId}</small>}
                         </div>
                     </div>
                 </div>
@@ -438,7 +441,7 @@ function Recommendations() {
                                                 onClick={() =>
                                                     navigate(
                                                         `/products/${encodeURIComponent(item.parent_asin)}`,
-                                                        { state: { userId } })}>
+                                                        { state: { userId, userName } })}>
                                                 Ver detalhes
                                                 <span aria-hidden="true">→</span>
                                             </button>

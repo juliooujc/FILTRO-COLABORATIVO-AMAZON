@@ -73,7 +73,7 @@ function ProductDetails() {
         if (window.history.length > 1) {
             navigate(-1);
         } else if (userId) {
-            navigate("/recommendations", { state: { userId } });
+            navigate("/recommendations", { state: { userId, userName } });
         } else {
             navigate("/");
         }
@@ -90,7 +90,7 @@ function ProductDetails() {
                 <nav className="dashboard-nav">
                     <button
                         onClick={() =>
-                            navigate("/dashboard", { state: { userId } })
+                            navigate("/dashboard", { state: { userId, userName } })
                         }
                     >
                         Dashboard
@@ -98,7 +98,7 @@ function ProductDetails() {
 
                     <button
                         onClick={() =>
-                            navigate("/recommendations", { state: { userId } })
+                            navigate("/recommendations", { state: { userId, userName } })
                         }
                     >
                         Recomendações
@@ -106,7 +106,7 @@ function ProductDetails() {
 
                     <button
                         onClick={() =>
-                            navigate("/history", { state: { userId } })
+                            navigate("/history", { state: { userId, userName } })
                         }
                     >
                         Histórico

@@ -3,6 +3,22 @@ import { useNavigate } from "react-router-dom";
 
 import { getUsers } from "../api/users";
 
+function normalizeUser(user) {
+    // Compatibilidade com a resposta antiga: "users": ["ID123", ...]
+    if (typeof user === "string") {
+        return {
+            user_id: user,
+            name: "",
+        };
+    }
+
+    // Formato esperado atualmente: "users": [{ user_id, name }, ...]
+    return {
+        user_id: String(user?.user_id ?? ""),
+        name: String(user?.name ?? ""),
+    };
+}
+
 function UserSelection() {
     const navigate = useNavigate();
 
@@ -21,12 +37,16 @@ function UserSelection() {
 
                 const data = await getUsers();
 
-                setUsers(data.users ?? []);
+                const normalizedUsers = (data.users ?? [])
+                    .map(normalizeUser)
+                    .filter((user) => user.user_id);
+
+                setUsers(normalizedUsers);
             } catch (err) {
                 console.error(err);
+
                 setError(
-                    err.message ||
-                    "Não foi possível carregar os usuários."
+                    err.message || "Não foi possível carregar os usuários."
                 );
             } finally {
                 setLoading(false);
@@ -37,33 +57,35 @@ function UserSelection() {
     }, []);
 
     const filteredUsers = useMemo(() => {
-        const normalizedSearch = search
-            .trim()
-            .toLowerCase();
+        const normalizedSearch = search.trim().toLowerCase();
 
         if (!normalizedSearch) {
             return users.slice(0, 6);
         }
 
         return users
-            .filter((userId) =>
-                userId.toLowerCase().includes(normalizedSearch)
-            )
+            .filter((user) => {
+                return (
+                    user.user_id.toLowerCase().includes(normalizedSearch) ||
+                    user.name.toLowerCase().includes(normalizedSearch)
+                );
+            })
             .slice(0, 12);
     }, [users, search]);
 
-    function handleSelectUser(userId) {
-        setSelectedUser(userId);
+    function handleSelectUser(user) {
+        setSelectedUser(user);
     }
 
     function handleEnter() {
-        if (!selectedUser) {
+        if (!selectedUser?.user_id) {
             return;
         }
 
         navigate("/dashboard", {
             state: {
-                userId: selectedUser,
+                userId: selectedUser.user_id,
+                userName: selectedUser.name,
             },
         });
     }
@@ -72,21 +94,13 @@ function UserSelection() {
         <main className="selection-page">
             <header className="topbar">
                 <div className="brand">
-                    <div className="brand-mark">
-                        G
-                    </div>
-
+                    <div className="brand-mark">G</div>
                     <span>GourmetRec</span>
                 </div>
 
                 <nav className="topbar-nav">
-                    <button type="button">
-                        Sobre
-                    </button>
-
-                    <button type="button">
-                        Ajuda
-                    </button>
+                    <button type="button">Sobre</button>
+                    <button type="button">Ajuda</button>
                 </nav>
             </header>
 
@@ -94,9 +108,7 @@ function UserSelection() {
                 <div className="selection-overlay" />
 
                 <div className="selection-card">
-                    <div className="selection-icon">
-                        G
-                    </div>
+                    <div className="selection-icon">G</div>
 
                     <h1>GourmetRec</h1>
 
@@ -107,29 +119,22 @@ function UserSelection() {
                     </h2>
 
                     <p className="selection-description">
-                        Descubra novos sabores e produtos
-                        gourmet da Amazon baseados nas
-                        avaliações de usuários semelhantes.
+                        Descubra novos sabores e produtos gourmet da Amazon
+                        baseados nas avaliações de usuários semelhantes.
                     </p>
 
                     <div className="selection-divider" />
 
-                    <h3>
-                        Selecione um usuário para começar
-                    </h3>
+                    <h3>Selecione um usuário para começar</h3>
 
                     <div className="search-box">
-                        <span className="search-icon">
-                            ⌕
-                        </span>
+                        <span className="search-icon">⌕</span>
 
                         <input
                             type="text"
-                            placeholder="Pesquisar usuário..."
+                            placeholder="Pesquisar por nome ou ID..."
                             value={search}
-                            onChange={(event) =>
-                                setSearch(event.target.value)
-                            }
+                            onChange={(event) => setSearch(event.target.value)}
                         />
                     </div>
 
@@ -156,8 +161,8 @@ function UserSelection() {
                             <strong>Erro:</strong>
                             <span>{error}</span>
                             <small>
-                                Verifique se o FastAPI está
-                                executando em localhost:8000.
+                                Verifique se o FastAPI está executando em
+                                localhost:8000.
                             </small>
                         </div>
                     )}
@@ -166,33 +171,39 @@ function UserSelection() {
                         <>
                             {filteredUsers.length > 0 ? (
                                 <div className="users-grid">
-                                    {filteredUsers.map((userId) => {
+                                    {filteredUsers.map((user) => {
                                         const isSelected =
-                                            selectedUser === userId;
+                                            selectedUser?.user_id ===
+                                            user.user_id;
+
+                                        const displayName =
+                                            user.name.trim() || user.user_id;
 
                                         return (
                                             <button
-                                                key={userId}
+                                                key={user.user_id}
                                                 type="button"
                                                 className={`user-button ${
-                                                    isSelected
-                                                        ? "selected"
-                                                        : ""
+                                                    isSelected ? "selected" : ""
                                                 }`}
                                                 onClick={() =>
-                                                    handleSelectUser(
-                                                        userId
-                                                    )
+                                                    handleSelectUser(user)
                                                 }
                                             >
                                                 <span className="user-avatar">
-                                                    {userId
+                                                    {displayName
                                                         .charAt(0)
                                                         .toUpperCase()}
                                                 </span>
 
                                                 <span className="user-id">
-                                                    {userId}
+                                                    <strong>{displayName}</strong>
+
+                                                    {user.name.trim() && (
+                                                        <small>
+                                                            {user.user_id}
+                                                        </small>
+                                                    )}
                                                 </span>
 
                                                 {isSelected && (
@@ -209,10 +220,8 @@ function UserSelection() {
                                     <strong>
                                         Nenhum usuário encontrado
                                     </strong>
-
                                     <span>
-                                        Tente pesquisar por outro
-                                        trecho do ID.
+                                        Tente pesquisar por outro nome ou ID.
                                     </span>
                                 </div>
                             )}
@@ -227,21 +236,25 @@ function UserSelection() {
                     >
                         <span>
                             {selectedUser
-                                ? "Entrar no sistema"
+                                ? `Entrar como ${
+                                      selectedUser.name.trim() ||
+                                      selectedUser.user_id
+                                  }`
                                 : "Selecione um usuário"}
                         </span>
 
                         {selectedUser && (
-                            <span className="arrow">
-                                →
-                            </span>
+                            <span className="arrow">→</span>
                         )}
                     </button>
 
                     {selectedUser && (
                         <div className="selected-user-info">
                             Usuário selecionado:
-                            <strong>{selectedUser}</strong>
+                            <strong>
+                                {selectedUser.name.trim() ||
+                                    selectedUser.user_id}
+                            </strong>
                         </div>
                     )}
                 </div>

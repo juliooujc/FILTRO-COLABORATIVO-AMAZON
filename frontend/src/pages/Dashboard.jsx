@@ -42,6 +42,8 @@ function Dashboard() {
     const navigate = useNavigate();
 
     const userId = location.state?.userId;
+    const userName = location.state?.userName;
+    const displayName = userName || userId;
 
     const [history, setHistory] = useState([]);
     const [recommendations, setRecommendations] = useState([]);
@@ -238,7 +240,7 @@ function Dashboard() {
                     <button
                         className="active"
                         onClick={() =>
-                            navigate("/dashboard", { state: { userId } })
+                            navigate("/dashboard", { state: { userId, userName } })
                         }
                     >
                         Dashboard
@@ -247,7 +249,7 @@ function Dashboard() {
                     <button
                         onClick={() =>
                             navigate("/recommendations", {
-                                state: { userId },
+                                state: { userId, userName },
                             })
                         }
                     >
@@ -256,7 +258,7 @@ function Dashboard() {
 
                     <button
                         onClick={() =>
-                            navigate("/history", { state: { userId } })
+                            navigate("/history", { state: { userId, userName } })
                         }
                     >
                         Histórico
@@ -289,12 +291,13 @@ function Dashboard() {
 
                     <div className="current-user">
                         <span className="current-user-avatar">
-                            {userId.charAt(0).toUpperCase()}
+                            {displayName.charAt(0).toUpperCase()}
                         </span>
 
                         <div>
                             <small>Usuário atual</small>
-                            <strong>{userId}</strong>
+                            <strong>{displayName}</strong>
+                            {userName && <small>{userId}</small>}
                         </div>
                     </div>
                 </div>
