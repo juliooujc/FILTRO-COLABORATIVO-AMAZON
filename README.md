@@ -26,6 +26,6 @@ Para subir o frontend
     npm run dev
 
 * Para o banco de dados:
-O banco usado é o PostgreSQL e o backup do banco é o arquivo filtro-colaborativo-amazon.sql
-Recomendamos usar a ferramenta pgAdmin4 para exportar e gerenciar as informações dispostas 
-no backup
+O banco usado é o PostgreSQL e para receber o arquivo backup do banco de dados entre em contado
+com jcsme.snf24@uea.edu.br. Recomendamos usar a ferramenta pgAdmin4 para exportar e gerenciar as
+informações dispostas no backup
