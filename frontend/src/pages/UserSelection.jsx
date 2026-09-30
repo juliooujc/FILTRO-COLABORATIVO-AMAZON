@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { createUser, getUsers } from "../api/users";
+import { createUser, getUser, getUsers } from "../api/users";
 
 function normalizeUser(user) {
     // Compatibilidade com a resposta antiga: "users": ["ID123", ...]
@@ -23,8 +23,10 @@ function UserSelection() {
     const navigate = useNavigate();
 
     const [users, setUsers] = useState([]);
+    const [searchResults, setSearchResults] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
     const [search, setSearch] = useState("");
+    const [searchLoading, setSearchLoading] = useState(false);
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -62,23 +64,55 @@ function UserSelection() {
 
         loadUsers();
     }, []);
-
-    const filteredUsers = useMemo(() => {
-        const normalizedSearch = search.trim().toLowerCase();
+    
+    useEffect(() => {
+        const normalizedSearch = search.trim();
 
         if (!normalizedSearch) {
-            return users.slice(0, 6);
+            setSearchResults([]);
+            return;
         }
 
-        return users
-            .filter((user) => {
-                return (
-                    user.user_id.toLowerCase().includes(normalizedSearch) ||
-                    user.name.toLowerCase().includes(normalizedSearch)
+        const timeout = setTimeout(async () => {
+            try {
+                setSearchLoading(true);
+                setError(null);
+
+                const isUserId = normalizedSearch.length > 20;
+
+                const data = await getUser(
+                    isUserId
+                        ? { userId: normalizedSearch }
+                        : { name: normalizedSearch }
                 );
-            })
-            .slice(0, 12);
-    }, [users, search]);
+
+                const results = (data.users ?? [])
+                    .map(normalizeUser)
+                    .filter((user) => user.user_id);
+
+                setSearchResults(results);
+            } catch (err) {
+                console.error(err);
+
+                if (err.status === 404) {
+                    setSearchResults([]);
+                } else {
+                    setError(
+                        err.message ||
+                            "Não foi possível pesquisar os usuários."
+                    );
+                }
+            } finally {
+                setSearchLoading(false);
+            }
+        }, 300);
+
+        return () => clearTimeout(timeout);
+    }, [search]);
+
+    const filteredUsers = search.trim()
+        ? searchResults
+        : users.slice(0, 6);
 
     function handleSelectUser(user) {
         setSelectedUser(user);

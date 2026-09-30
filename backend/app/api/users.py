@@ -6,6 +6,7 @@ from app.db.queries import (
     buscar_usuarios,
     criar_usuario,
     usuario_existe,
+    buscar_usuario_historico,
 )
 
 from app.models.schemas import UserRequest
@@ -25,6 +26,29 @@ def get_users():
         "users": users
     }
 
+@router.get("/user")
+def get_user(name: str = None, user_id: str = None):
+
+    if not name and not user_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Informe name ou user_id."
+        )
+
+    users = buscar_usuario(
+        name=name,
+        user_id=user_id
+    )
+
+    if not users:
+        raise HTTPException(
+            status_code=404,
+            detail="Usuário não encontrado."
+        )
+
+    return {
+        "users": users
+    }
 
 @router.post("")
 def create_user(request: UserRequest):
@@ -57,7 +81,7 @@ def create_user(request: UserRequest):
 @router.get("/{user_id}/history")
 def get_user_history(user_id: str):
 
-    user = buscar_usuario(user_id)
+    user = buscar_usuario_historico(user_id)
 
     if not user:
         raise HTTPException(

@@ -21,3 +21,17 @@ export async function createUser(userId, name) {
         }),
     });
 }
+
+export async function getUser(search) {
+    const params = new URLSearchParams();
+
+    if (search.name) {
+        params.append("name", search.name);
+    }
+
+    if (search.userId) {
+        params.append("user_id", search.userId);
+    }
+
+    return request(`/users/user?${params.toString()}`);
+}

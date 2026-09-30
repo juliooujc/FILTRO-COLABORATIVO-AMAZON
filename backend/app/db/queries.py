@@ -267,7 +267,50 @@ def usuario_existe(user_id: str):
     return row[0]
 
 
-def buscar_usuario(user_id: str):
+def buscar_usuario(name: str = None, user_id: str = None):
+    if name:
+        query = """
+            SELECT
+                user_id,
+                name
+            FROM users
+            WHERE name ILIKE %s
+            ORDER BY name
+            limit 1000;
+        """
+        params = (f"%{name}%",)
+
+    elif user_id:
+        query = """
+            SELECT
+                user_id,
+                name
+            FROM users
+            WHERE user_id = %s
+            LIMIT 1;
+        """
+        params = (user_id,)
+
+    else:
+        return None
+
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(query, params)
+            rows = cur.fetchall()
+
+    if not rows:
+        return None
+
+    return [
+        {
+            "user_id": row[0],
+            "name": row[1],
+        }
+        for row in rows
+    ]
+
+def buscar_usuario_historico(user_id: str):
     query = """
         SELECT
             user_id,
