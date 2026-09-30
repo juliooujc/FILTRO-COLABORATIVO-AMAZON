@@ -4,9 +4,11 @@ from app.evaluation.run_evaluation import (
 
 
 EXPERIMENTOS = [
+    ("cosine", 3),
     ("cosine", 5),
     ("cosine", 11),
     ("cosine", 21),
+    ("pearson", 3),
     ("pearson", 5),
     ("pearson", 11),
     ("pearson", 21),

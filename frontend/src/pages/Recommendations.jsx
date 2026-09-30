@@ -291,9 +291,9 @@ function Recommendations() {
                             >
                                 <option value={3}>3</option>
                                 <option value={5}>5</option>
-                                <option value={10}>10</option>
+                                <option value={11}>11</option>
                                 <option value={15}>15</option>
-                                <option value={20}>20</option>
+                                <option value={21}>21</option>
                             </select>
                         </label>
 
